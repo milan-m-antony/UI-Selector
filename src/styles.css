@@ -1,0 +1,1057 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-color: #3498db;
+  --background-color: #f0f2f5;
+  --accent-color: #2ecc71;
+  --text-color: #2c3e50;
+  --card-bg: #ffffff;
+  --border-color: #e0e0e0;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 🔹 Core Glassmorphism Effect */
+
+/* 🔹 Core Glassmorphism Effect (improved for readability) */
+.glass {
+  position: relative;
+  background: rgba(255, 255, 255, 0.08); /* transparent white layer */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  overflow: hidden; /* necessary for the overlay */
+  color: #fff;
+}
+
+/* 🔹 Subtle dark overlay to improve text contrast (Option 1 - recommended) */
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom right,
+    rgba(0, 0, 0, 0.28),
+    rgba(0, 0, 0, 0.08)
+  );
+  pointer-events: none;
+}
+
+/* Ensure text and interactive elements render above the overlay */
+.glass * {
+  position: relative;
+  z-index: 1;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* 🔹 Optional fallbacks / alternatives */
+/* Option 2: text shadow fallback for smaller contrast adjustments */
+.glass h1, .glass h2, .glass h3, .glass p, .glass label {
+  text-shadow: 0 1px 4px rgba(0,0,0,0.45);
+}
+
+/* Option 3: darker glass variant (use when you want a stronger dark tint) */
+.glass.dark {
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,255,255,0.12);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+/* 🔹 Example modifiers */
+.glass-panel {
+  padding: 24px;
+  margin: 20px auto;
+  max-width: 600px;
+}
+
+.glass-button {
+  display: inline-block;
+  padding: 14px 24px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Keep glassmorphism ONLY for prompt panel bar */
+.prompt-panel-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(79, 209, 199, 0.14);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 0.6rem 0.9rem;
+  min-height: 44px;
+  box-shadow: 0 8px 20px rgba(31, 38, 135, 0.18);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.preview-section-spacing {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Demo helper styles (minimal) */
+.demo-wrap { padding: 24px; }
+.demo-row { display:flex; gap:12px; margin-top:12px; align-items:center; }
+
+/* Prompt type selector */
+.type-selector { display:flex; gap:0.5rem; margin:0.75rem 0 1rem 0; flex-wrap:wrap; }
+.type-btn {
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer;
+  font-weight: 600;
+}
+.type-btn.active {
+  background: linear-gradient(180deg,#14b8a6,#0d9488);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(20,184,166,0.18);
+}
+
+/* Floating Prompt Panel */
+.prompt-panel-floating {
+  position: fixed;
+  z-index: 10000;
+  /* wider by default so the bar looks longer */
+  min-width: 520px;
+  max-width: 900px;
+  width: auto;
+}
+
+/* Fixed bottom-left placement for the floating toolbar (non-draggable simplified) */
+.prompt-panel-floating.bottom-left {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 10003;
+}
+
+/* Modal / lightbox styles for expanded prompt panel */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10005;
+  padding: 2rem;
+}
+
+.modal-center { width: 100%; max-width: 900px; }
+
+.modal-content { max-height: 80vh; overflow-y: auto; }
+
+.selection-mode-badge {
+  background-color: rgba(52, 152, 219, 0.2);
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-left: 0.5rem;
+  border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+.bar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #ffffff;
+  /* allow left side to grow so buttons align to the right evenly */
+  flex: 1 1 auto;
+}
+
+.magnify-icon {
+  flex-shrink: 0;
+}
+
+.magnify-icon circle {
+  stroke: #60a5fa;
+  fill: #60a5fa;
+}
+
+.magnify-icon path {
+  stroke: #7c3aed;
+  fill: none;
+}
+
+.bar-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.bar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  /* keep toolbar tight and aligned to the end */
+  flex: 0 0 auto;
+  justify-content: flex-end;
+}
+
+/* cursor states when dragging */
+.prompt-panel-bar { cursor: grab; }
+.prompt-panel-floating.dragging .prompt-panel-bar,
+.prompt-panel-bar.dragging { cursor: grabbing; }
+
+/* Shared toolbar button style used in the prompt-panel bar */
+.toolbar-btn {
+  padding: 0.45rem 0.9rem;
+  background-color: transparent; /* default transparent for glass bar */
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toolbar-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.03); }
+
+/* Make Edit and Disable stand out — keep earlier colors but unify sizing */
+.btn-edit {
+  padding: 0.45rem 0.9rem;
+  background-color: #14b8a6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+
+.btn-edit:hover { background-color: #0d9488; transform: translateY(-1px); }
+
+.btn-disable {
+  padding: 0.45rem 0.9rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-disable:hover { background-color: #dc2626; transform: translateY(-1px); }
+
+/* Toolbar button color variants */
+.toolbar-btn.primary {
+  background-color: #14b8a6;
+  color: white;
+  border: none;
+}
+.toolbar-btn.primary:hover { background-color: #0d9488; }
+
+.toolbar-btn.danger {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+}
+.toolbar-btn.danger:hover { background-color: #dc2626; }
+
+.toolbar-btn.secondary {
+  background-color: #f3f4f6;
+  color: #111827;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.toolbar-btn.secondary:hover { background-color: #e6e9ee; }
+
+.toolbar-btn.neutral {
+  background: transparent;
+  color: #2c3e50;
+  border: 1px solid rgba(44,62,80,0.06);
+}
+.toolbar-btn.neutral:hover { background: rgba(44,62,80,0.04); }
+
+/* Toast toggle in toolbar - visible quick control */
+.toolbar-btn.toast-toggle {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+  color: rgba(255,255,255,0.92);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.toolbar-btn.toast-toggle.active {
+  background: linear-gradient(180deg,#14b8a6,#0d9488);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(20,184,166,0.18);
+}
+
+
+.btn-edit {
+  padding: 0.375rem 0.75rem;
+  background-color: #14b8a6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-edit:hover {
+  background-color: #0d9488;
+}
+
+.btn-edit.active {
+  background-color: #0d9488;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.btn-disable {
+  padding: 0.375rem 0.75rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-disable:hover {
+  background-color: #dc2626;
+}
+
+.btn-help {
+  color: #3498db;
+  text-decoration: underline;
+  font-size: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.btn-help:hover {
+  color: #2980b9;
+}
+
+.btn-menu {
+  background: none;
+  border: none;
+  color: #2c3e50;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.btn-menu:hover {
+  background-color: rgba(44, 62, 80, 0.1);
+}
+
+.prompt-panel-content {
+  background-color: transparent;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 0.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* When the prompt panel is shown as the centered modal, use glassmorphism */
+.prompt-panel-content.modal-content {
+  /* glass-like surface */
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  color: #ffffff; /* stronger white for readability */
+  box-shadow: 0 14px 40px rgba(0,0,0,0.55);
+  padding: 2rem;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 720px;
+}
+
+/* Compact modal variant used by help/settings and now prompt panel */
+.prompt-panel-content.small-modal {
+  max-width: 520px; /* match help box feel */
+  padding: 1rem 1.1rem; /* slightly tighter */
+  width: auto;
+  /* slightly darker glass so inner text pops */
+  background: linear-gradient(180deg, rgba(0,0,0,0.46), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.prompt-panel-content.small-modal .metadata-section {
+  padding: 0.85rem;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.62);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.prompt-panel-content.small-modal .input-section {
+  margin-bottom: 0.9rem;
+}
+
+.prompt-panel-content.small-modal .button-group {
+  gap: 0.6rem;
+}
+
+/* Stronger text styles inside compact modal */
+.prompt-panel-content.small-modal .modal-title {
+  margin-top: 0;
+  margin-bottom: 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.prompt-panel-content.small-modal .settings-label {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.prompt-panel-content.small-modal .settings-desc {
+  color: rgba(255,255,255,0.88);
+  font-size: 0.92rem;
+}
+
+.prompt-panel-content.small-modal .metadata-item {
+  color: rgba(255,255,255,0.95);
+}
+
+.prompt-panel-content.small-modal .metadata-item code,
+.prompt-panel-content.small-modal .metadata-label {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.prompt-panel-content.small-modal .code-snippet {
+  background: rgba(0,0,0,0.68);
+  color: #fff;
+  padding: 0.85rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.04);
+  font-size: 0. ninerem;
+  line-height: 1.5;
+}
+
+.prompt-panel-content.small-modal .input-section textarea {
+  background: rgba(0,0,0,0.64);
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 0.85rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.prompt-panel-content.small-modal .prompt-output,
+.prompt-panel-content.small-modal .generated-prompt {
+  background: rgba(0,0,0,0.64);
+  color: #fff;
+  padding: 0.85rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Modal body: scroll internally if content is tall, but hide scrollbars visually */
+.prompt-panel-content.small-modal {
+  /* use the same 'lightning box' glass effect used by settings/help */
+  background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.08);
+  -webkit-backdrop-filter: blur(8px) saturate(1.08);
+  backdrop-filter: blur(8px) saturate(1.08);
+}
+
+.prompt-panel-content.small-modal .modal-body {
+  overflow-y: auto;
+  max-height: calc(100vh - 140px);
+  padding-right: 6px; /* small space to avoid content touching edge when scrollbar hidden */
+  -ms-overflow-style: none; /* IE and Edge */
+  /* hide scrollbar on Firefox by using thin + transparent thumb as fallback */
+  scrollbar-width: thin;
+}
+
+/* Hide webkit scrollbars while preserving scrolling behavior */
+.prompt-panel-content.small-modal .modal-body::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+/* Slightly tighten metadata and generated prompt for the compact modal */
+.prompt-panel-content.small-modal .metadata-section,
+.prompt-panel-content.small-modal .generated-prompt {
+  background: rgba(0,0,0,0.28);
+}
+
+/* Ensure buttons remain centered when modal body is present */
+.prompt-panel-content.small-modal .button-group { justify-content: center; }
+
+/* Responsive fallback for small screens: make the floating panel fit the viewport */
+@media (max-width: 640px) {
+  .prompt-panel-floating {
+    min-width: 280px;
+    width: calc(100% - 32px);
+    left: 16px !important;
+    right: 16px !important;
+  }
+
+  .prompt-panel-content.modal-content {
+    max-width: calc(100% - 40px);
+    padding: 1rem;
+  }
+}
+
+/* Inner sections should be slightly more transparent/darker to sit on the glass */
+.prompt-panel-content.modal-content .metadata-section {
+  /* stronger contrast for readability */
+  background: rgba(0,0,0,0.42);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.prompt-panel-content.modal-content .metadata-label,
+.prompt-panel-content.modal-content .code-snippet,
+.prompt-panel-content.modal-content .metadata-item code,
+.prompt-panel-content.modal-content .generated-prompt,
+.prompt-panel-content.modal-content .prompt-output {
+  color: rgba(255,255,255,0.92);
+}
+
+.prompt-panel-content.modal-content .input-section textarea {
+  /* match metadata and code blocks for readability */
+  background: rgba(0,0,0,0.42);
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.prompt-panel-content.modal-content .input-section label {
+  color: rgba(255,255,255,0.95);
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.prompt-panel-content.modal-content .input-section textarea::placeholder {
+  color: rgba(255,255,255,0.7);
+}
+
+.prompt-panel-content.modal-content .input-section textarea:focus {
+  outline: none;
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 0 0 6px rgba(255,255,255,0.03);
+}
+
+.prompt-panel-content.modal-content .metadata-item code {
+  display: inline-block;
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.95);
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.85rem;
+}
+
+.prompt-panel-content.modal-content .btn-close {
+  color: rgba(255,255,255,0.85);
+}
+
+.prompt-panel-content.modal-content .button-group {
+  display: flex;
+  gap: 0.9rem;
+  justify-content: center; /* centered in the modal */
+  align-items: center;
+  margin-top: 1rem;
+}
+
+/* Primary action styling */
+.prompt-panel-content.modal-content .btn-primary {
+  color: #fff;
+  flex: none;
+  min-width: 160px;
+  padding: 0.75rem 1.1rem;
+  border-radius: 10px;
+  font-weight: 700;
+  background: linear-gradient(180deg, #2f8fd6, #1f73c0);
+  box-shadow: 0 6px 18px rgba(31, 115, 206, 0.25);
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+
+.prompt-panel-content.modal-content .btn-primary:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.06);
+  box-shadow: 0 10px 26px rgba(31, 115, 206, 0.32);
+}
+
+/* Secondary action (copy) lighter, compact */
+.prompt-panel-content.modal-content .btn-secondary {
+  color: #fff;
+  flex: none;
+  min-width: 140px;
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  background: linear-gradient(180deg,#34d399,#10b981); /* green */
+  border: 1px solid rgba(16,185,129,0.12);
+  color: rgba(255,255,255,0.95);
+  transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease, filter 0.12s;
+}
+
+.prompt-panel-content.modal-content .btn-secondary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  color: rgba(255,255,255,1);
+  box-shadow: 0 10px 24px rgba(16,185,129,0.14);
+}
+
+.prompt-panel-content.modal-content .btn-secondary:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.prompt-panel-content.modal-content .btn-secondary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* On small viewports stack buttons vertically and make them full width */
+@media (max-width: 640px) {
+  .prompt-panel-content.modal-content .button-group {
+    flex-direction: column-reverse; /* keep primary on top */
+    align-items: stretch;
+  }
+
+  .prompt-panel-content.modal-content .btn-primary,
+  .prompt-panel-content.modal-content .btn-secondary {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* code snippet block inside metadata should be readable */
+.prompt-panel-content.modal-content .code-snippet {
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.prompt-panel-content.modal-content .generated-prompt,
+.prompt-panel-content.modal-content .prompt-output {
+  background: rgba(0,0,0,0.42);
+  color: #fff;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 0.75rem;
+}
+
+.btn-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #95a5a6;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+  z-index: 12; /* ensure close button sits above modal content */
+  pointer-events: auto;
+}
+
+.btn-close:hover {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.metadata-section {
+  background-color: var(--background-color);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.metadata-item {
+  margin-bottom: 1rem;
+}
+
+.metadata-item:last-child {
+  margin-bottom: 0;
+}
+
+.metadata-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.metadata-item code {
+  font-family: 'Source Code Pro', monospace;
+  background-color: var(--card-bg);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  border: 1px solid var(--border-color);
+}
+
+.code-snippet {
+  font-family: 'Source Code Pro', monospace;
+  background-color: var(--card-bg);
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  white-space: pre-wrap;
+  overflow-x: auto;
+  margin-top: 0.5rem;
+}
+
+.no-selection {
+  text-align: center;
+  padding: 2rem;
+  color: #95a5a6;
+  background-color: var(--background-color);
+  border-radius: 8px;
+  border: 2px dashed var(--border-color);
+}
+
+.input-section {
+  margin-bottom: 1.5rem;
+}
+
+.input-section label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.input-section textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+}
+
+.input-section textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.button-group {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-primary,
+.btn-secondary {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+  box-shadow: var(--shadow);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-secondary {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #27ae60;
+  box-shadow: var(--shadow);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.generated-prompt {
+  background-color: var(--background-color);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.generated-prompt h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text-color);
+}
+
+.prompt-output {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  white-space: pre-wrap;
+  background-color: var(--card-bg);
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.preview-section-spacing {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  right: auto;
+  z-index: 10030; /* above modal overlay */
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+  pointer-events: none; /* allow clicks through unless on action */
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(28, 30, 33, 0.98);
+  color: #fff;
+  border-radius: 12px;
+  padding: 0.875rem 1rem;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.55);
+  min-width: 360px;
+  max-width: 640px;
+  animation: slideDown 0.32s cubic-bezier(.22,.9,.31,1) forwards;
+  border: 1px solid rgba(255,255,255,0.04);
+  pointer-events: auto; /* allow interacting with buttons inside toasts */
+}
+
+.toast-left {
+  flex: 0 0 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-icon-success { background: linear-gradient(180deg,#2ecc71,#20b15a); }
+.toast-icon-error { background: linear-gradient(180deg,#ef4444,#d73737); }
+.toast-icon-info { background: linear-gradient(180deg,#3498db,#2b87d6); }
+
+.toast-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.toast-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.125rem;
+}
+
+.toast-desc {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.8);
+}
+
+.toast-right {
+  flex: 0 0 auto;
+  margin-left: 0.75rem;
+}
+
+.toast-action {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toast-action:hover { background: rgba(255,255,255,0.16); }
+
+/* Settings menu and help popover */
+.settings-root { position: relative; }
+.settings-menu {
+  position: absolute;
+  right: 0;
+  top: 36px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem;
+  min-width: 220px;
+  box-shadow: var(--shadow);
+  z-index: 10002;
+}
+.settings-row { display:flex; align-items:center; justify-content:space-between; gap:0.5rem; }
+.settings-row-spaced { margin-top: 0.5rem; }
+.settings-label { font-weight:600; }
+.settings-desc { font-size:0.85rem; color:#777; }
+.settings-toggle { padding:0.35rem 0.6rem; border-radius:6px; border:none; cursor:pointer; font-weight:600; }
+.settings-toggle.on { background:#14b8a6; color:#fff; }
+.settings-toggle.off { background:#e5e7eb; color:#333; }
+
+.btn-help-icon, .btn-settings { background:none; border:none; cursor:pointer; padding:0.25rem; border-radius:6px; }
+.btn-help-icon:hover, .btn-settings:hover { background: rgba(44,62,80,0.06); }
+
+.help-popover { position: absolute; right: 56px; top: 36px; background: var(--card-bg); border:1px solid var(--border-color); padding:0.75rem; border-radius:8px; box-shadow:var(--shadow); z-index:10002; width:240px; }
+.help-popover .help-text { margin-top:0.25rem; font-size:0.9rem; color:var(--text-color); }
+
+/* Element Highlight Overlay */
+.element-highlight-overlay {
+  position: absolute;
+  pointer-events: none;
+  border: 3px solid #3498db;
+  border-radius: 4px;
+  background: rgba(52, 152, 219, 0.1);
+  z-index: 9999;
+  transition: all 0.1s ease;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3), 0 0 20px rgba(52, 152, 219, 0.5);
+}
+
+@keyframes pulseHighlight {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3), 0 0 20px rgba(52, 152, 219, 0.5);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.5), 0 0 30px rgba(52, 152, 219, 0.7);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3), 0 0 20px rgba(52, 152, 219, 0.5);
+  }
+}
+
+/* Slide down animation for top-centered toasts */
+@keyframes slideDown {
+  0% { transform: translateY(-12px); opacity: 0; }
+  60% { transform: translateY(6px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Visually hide content but keep it accessible to screen readers */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
