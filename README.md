@@ -1,4 +1,4 @@
-# UiSelector
+# Ui-Selector
 
 A compact React utility to inspect UI elements and generate developer prompts (Copilot/Cursor-ready).
 
